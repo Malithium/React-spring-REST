@@ -1,18 +1,20 @@
 'use strict';
 
+var $authToken = "";
 const React = require('react');
-const ReactDOM = require('react-dom')
+const ReactDOM = require('react-dom');
+const Keycloak = require('keycloak-js');
 const client = require('./client');
-
 const follow = require('./follow'); // function to hop multiple links by "rel"
-
 const root = '/api';
+
+
 
 class App extends React.Component {
 
     constructor(props) {
         super(props);
-        this.state = {employees: [], attributes: [], pageSize: 2, links: {}};
+        this.state = {employees: [], shifts: [], attributes: [], pageSize: 2, links: {}};
         this.updatePageSize = this.updatePageSize.bind(this);
         this.onCreate = this.onCreate.bind(this);
         this.onDelete = this.onDelete.bind(this);
@@ -21,13 +23,14 @@ class App extends React.Component {
 
     // tag::follow-2[]
     loadFromServer(pageSize) {
-        follow(client, root, [
+        follow(client, root, $authToken, [
             {rel: 'employees', params: {size: pageSize}}]
         ).then(employeeCollection => {
             return client({
                 method: 'GET',
                 path: employeeCollection.entity._links.profile.href,
-                headers: {'Accept': 'application/schema+json'}
+                headers: {'Accept': 'application/schema+json',
+                    'Authorization': 'Bearer ' + $authToken}
             }).then(schema => {
                 this.schema = schema.entity;
                 return employeeCollection;
@@ -44,15 +47,15 @@ class App extends React.Component {
 
     // tag::create[]
     onCreate(newEmployee) {
-        follow(client, root, ['employees']).then(employeeCollection => {
+        follow(client, root, $authToken, ['employees']).then(employeeCollection => {
             return client({
                 method: 'POST',
                 path: employeeCollection.entity._links.self.href,
                 entity: newEmployee,
-                headers: {'Content-Type': 'application/json'}
+                headers: {'Content-Type': 'application/json', 'Authorization': $authToken}
             })
         }).then(response => {
-            return follow(client, root, [
+            return follow(client, root, $authToken, [
                 {rel: 'employees', params: {'size': this.state.pageSize}}]);
         }).done(response => {
             this.onNavigate(response.entity._links.last.href);
@@ -62,7 +65,8 @@ class App extends React.Component {
 
     // tag::delete[]
     onDelete(employee) {
-        client({method: 'DELETE', path: employee._links.self.href}).done(response => {
+        console.log("I MADE IT");
+        client({method: 'DELETE', path: employee._links.self.href, headers: {'Accept': 'application/hal+json', 'Authorization':'Bearer ' + $authToken}}).done(response => {
             this.loadFromServer(this.state.pageSize);
         });
     }
@@ -70,7 +74,7 @@ class App extends React.Component {
 
     // tag::navigate[]
     onNavigate(navUri) {
-        client({method: 'GET', path: navUri}).done(employeeCollection => {
+        client({method: 'GET', path: navUri, headers: {'Accept': 'application/hal+json', 'Authorization':'Bearer ' + $authToken}}).done(employeeCollection => {
             this.setState({
                 employees: employeeCollection.entity._embedded.employees,
                 attributes: this.state.attributes,
@@ -128,7 +132,8 @@ class CreateDialog extends React.Component {
 
         // clear out the dialog's inputs
         this.props.attributes.forEach(attribute => {
-            ReactDOM.findDOMNode(this.refs[attribute]).value = '';
+            if(this.refs[attribute] != "shifts")
+                ReactDOM.findDOMNode(this.refs[attribute]).value = '';
         });
 
         // Navigate away from the dialog to hide it.
@@ -278,8 +283,19 @@ class Employee extends React.Component {
     }
 }
 // end::employee[]
+const kc = Keycloak('/keycloak.json');
+kc.init({onLoad: 'check-sso'}).success(authenticated =>{
+    if(authenticated){
+        setInterval(() => {
+            kc.updateToken(10).error(() => kc.logout());
+        }, 10000);
 
-ReactDOM.render(
-    <App />,
-    document.getElementById('react')
-)
+        $authToken = kc.token;
+        ReactDOM.render(
+            <App />,
+            document.getElementById('react')
+        )
+    } else {
+        kc.login();
+    }
+});

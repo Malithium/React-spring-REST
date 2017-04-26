@@ -12,6 +12,7 @@ import javax.persistence.*;
 public class Shift {
     private Long id;
     private String name;
+    private String employeeName;
     private Employee employee;
 
     public Shift(){}
@@ -45,8 +46,13 @@ public class Shift {
         this.name = name;
     }
 
-    public Shift(Employee employee, String name){
+    public String getEmployeeName() {return employeeName;}
+
+    public void setEmployeeName(String eName) {employeeName = eName;}
+
+    public Shift(Employee employee, String name, String employeeName){
         this.employee = employee;
         this.name = name;
+        this.employeeName = employee.getName();
     }
 }

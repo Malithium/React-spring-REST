@@ -16,6 +16,7 @@ public class Employee {
     private Long id;
     private String name;
     private String description;
+    @Column(nullable = true)
     private Set<Shift> shifts;
 
     @Id
