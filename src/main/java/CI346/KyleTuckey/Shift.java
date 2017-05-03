@@ -1,58 +1,34 @@
 package CI346.KyleTuckey;
 
+import javax.persistence.*;
+
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.Data;
 
-import javax.persistence.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
  * Created by Kyle Tuckey on 15/03/2017.
  */
-@Data
 @Entity
+@Data
 public class Shift {
-    private Long id;
+
+    @Column(name = "shift_id")
+    private @Id @GeneratedValue Long id;
     private String name;
-    private String employeeName;
-    private Employee employee;
 
-    public Shift(){}
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    public Long getId(){
-        return id;
-    }
-
-    public void setId(Long id)
-    {
-        this.id = id;
-    }
 
     @ManyToOne
+    @JsonBackReference
     @JoinColumn(name = "employee_id")
-    public Employee getEmployee(){
-        return employee;
-    }
+    private Employee employee;
 
-    public void setEmployee(Employee employee){
-        this.employee = employee;
-    }
+    private @Version @JsonIgnore Long version;
 
-    public String getName(){
-        return name;
-    }
+    private Shift(){}
 
-    public void setName(String name){
+    public Shift(String name){
         this.name = name;
-    }
-
-    public String getEmployeeName() {return employeeName;}
-
-    public void setEmployeeName(String eName) {employeeName = eName;}
-
-    public Shift(Employee employee, String name, String employeeName){
-        this.employee = employee;
-        this.name = name;
-        this.employeeName = employee.getName();
     }
 }

@@ -1,65 +1,31 @@
 package CI346.KyleTuckey;
 
+import javax.persistence.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
-import javax.persistence.*;
-import java.util.Set;
-
-/**
- * Created by kt172 on 13/03/2017.
- */
+import java.util.List;
 
 @Entity
-@Table(name = "employee")
+@Data
 public class Employee {
 
-    private Long id;
+    @Column(name = "employee_id")
+    private @Id @GeneratedValue Long id;
     private String name;
     private String description;
-    @Column(nullable = true)
-    private Set<Shift> shifts;
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    public Long getId(){
-        return id;
-    }
 
-    public void setId(Long id)
-    {
-        this.id = id;
-    }
+    @JsonIgnore
+    @OneToMany(orphanRemoval = true, mappedBy = "employee", fetch = FetchType.EAGER)
+    private List<Shift> shifts;
 
-    public String getName(){
-        return name;
-    }
+    private @Version @JsonIgnore Long version;
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    @OneToMany(mappedBy = "employee", cascade = CascadeType.ALL)
-    public Set<Shift> getShifts(){
-        return shifts;
-    }
-
-    public void setShifts(Set<Shift> shifts){
-        this.shifts = shifts;
-    }
-
-    public String getDescription(){
-        return description;
-    }
-
-    public void setDescription(String description){
-        this.description = description;
-    }
-
-    private Employee() {}
+    private Employee(){}
 
     public Employee(String name, String description) {
         this.name = name;
         this.description = description;
     }
-
 }

@@ -25,19 +25,7 @@ public class DatabaseLoader implements CommandLineRunner {
     public void run(String... strings) throws Exception {
         /*
         Employee frodo = new Employee("Frodo Baggins", "Ring Bearer");
-        Set shiftsA = new HashSet<Shift>(){{
-            add(new Shift(frodo, "Ring Duty", frodo.getName()));
-            add(new Shift(frodo, "Gollum caretaker", frodo.getName()));
-        }};
-        frodo.setShifts(shiftsA);
-
         Employee bilbo = new Employee("Bilbo Baggins", "Thief");
-        Set shiftsB = new HashSet<Shift>(){{
-            add(new Shift(bilbo, "gold seeking", bilbo.getName()));
-            add(new Shift(bilbo, "birthday", bilbo.getName()));
-        }};
-        bilbo.setShifts(shiftsB);
-
         this.eRepository.save(frodo);
         this.eRepository.save(bilbo);
         */
