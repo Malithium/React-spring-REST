@@ -44,6 +44,9 @@
 /* 0 */
 /***/ function(module, exports, __webpack_require__) {
 
+	// This file was based on the linked tutorial under the Creative Commons Licence
+	// https://spring.io/guides/tutorials/react-and-spring-data-rest/
+	
 	'use strict';
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -445,23 +448,57 @@
 	                newShift[attribute] = ReactDOM.findDOMNode(_this11.refs[attribute]).value.trim();
 	            });
 	            this.props.onCreateShift(newShift, this.props.shifts);
+	            this.props.handleShifts();
 	        }
 	    }, {
 	        key: 'render',
 	        value: function render() {
 	            var inputs = [];
 	            for (var attr in this.props.attributes) {
-	                if (this.props.attributes[attr] != 'employee') {
+	                if (this.props.attributes[attr] == 'name') {
 	                    inputs.push(React.createElement(
 	                        'p',
 	                        { key: this.props.attributes[attr] },
 	                        React.createElement('input', { type: 'text', placeholder: this.props.attributes[attr], ref: this.props.attributes[attr], className: 'field' })
 	                    ));
-	                } else {
+	                }
+	                if (this.props.attributes[attr] == 'employee') {
 	                    inputs.push(React.createElement(
 	                        'p',
 	                        { key: this.props.attributes[attr] },
 	                        React.createElement('input', { type: 'text', disabled: 'true', value: this.props.selfEmployee.href, ref: this.props.attributes[attr], className: 'field' })
+	                    ));
+	                }
+	                if (this.props.attributes[attr] == 'date') {
+	                    inputs.push(React.createElement(
+	                        'p',
+	                        { key: this.props.attributes[attr] },
+	                        React.createElement('input', { type: 'date', placeholder: this.props.attributes[attr], ref: this.props.attributes[attr], className: 'field' })
+	                    ));
+	                }
+	                if (this.props.attributes[attr] == 'time') {
+	                    inputs.push(React.createElement(
+	                        'p',
+	                        { key: this.props.attributes[attr] },
+	                        React.createElement(
+	                            'select',
+	                            { name: this.props.attributes[attr], ref: this.props.attributes[attr], className: 'field' },
+	                            React.createElement(
+	                                'option',
+	                                { value: 'Morning' },
+	                                'Morning'
+	                            ),
+	                            React.createElement(
+	                                'option',
+	                                { value: 'Afternoon' },
+	                                'Afternoon'
+	                            ),
+	                            React.createElement(
+	                                'option',
+	                                { value: 'Evening' },
+	                                'Evening'
+	                            )
+	                        )
 	                    ));
 	                }
 	            }
@@ -596,7 +633,6 @@
 	
 	        _this15.handleShifts = _this15.handleShifts.bind(_this15);
 	        _this15.state = { getShifts: [] };
-	        _this15.handleShifts();
 	        return _this15;
 	    }
 	
@@ -612,34 +648,43 @@
 	            }).then(function (shiftsCollection) {
 	                return shiftsCollection.entity._embedded.shifts;
 	            }).done(function (shifts) {
+	                console.log(shifts);
 	                _this16.setState({
 	                    getShifts: shifts
 	                });
 	            });
+	            console.log(this.state.getShifts);
+	            window.location.href = "#" + "showShift-" + this.props.selfEmployee.href;
 	        }
 	    }, {
 	        key: 'render',
 	        value: function render() {
 	            var _this17 = this;
 	
-	            var shifts = this.state.getShifts.map(function (shift) {
-	                return React.createElement(Shift, { key: shift._links.self.href,
-	                    shift: shift,
-	                    attributes: _this17.props.attributes,
-	                    onShiftDelete: _this17.props.onShiftDelete,
-	                    handleShifts: _this17.handleShifts });
-	            });
+	            var shifts = [];
+	            if (this.state.getShifts.length > 0) {
+	                shifts = this.state.getShifts.map(function (shift) {
+	                    return React.createElement(Shift, { key: shift._links.self.href,
+	                        shift: shift,
+	                        attributes: _this17.props.attributes,
+	                        onShiftDelete: _this17.props.onShiftDelete,
+	                        handleShifts: _this17.handleShifts });
+	                });
+	            }
+	
+	            var dialogId = "ShowShift-" + this.props.selfEmployee.href;
+	
 	            return React.createElement(
 	                'div',
-	                null,
+	                { key: this.props.selfEmployee.href },
 	                React.createElement(
 	                    'a',
-	                    { href: '#viewShifts' },
-	                    'Shifts'
+	                    { onClick: this.handleShifts, href: "#" + dialogId },
+	                    'ShowShifts'
 	                ),
 	                React.createElement(
 	                    'div',
-	                    { id: 'viewShifts', className: 'modalDialog' },
+	                    { id: dialogId, className: 'modalDialog' },
 	                    React.createElement(
 	                        'div',
 	                        null,
@@ -657,7 +702,7 @@
 	                            attributes: this.props.attributes,
 	                            onCreateShift: this.props.onCreateShift,
 	                            selfEmployee: this.props.selfEmployee,
-	                            handleShifts: this.handleShifts() }),
+	                            handleShifts: this.handleShifts }),
 	                        React.createElement(
 	                            'h2',
 	                            null,
@@ -676,6 +721,16 @@
 	                                        'th',
 	                                        null,
 	                                        'Name'
+	                                    ),
+	                                    React.createElement(
+	                                        'th',
+	                                        null,
+	                                        'Date'
+	                                    ),
+	                                    React.createElement(
+	                                        'th',
+	                                        null,
+	                                        'Time'
 	                                    ),
 	                                    React.createElement('th', null)
 	                                ),
@@ -930,6 +985,11 @@
 	    }
 	
 	    _createClass(Shift, [{
+	        key: 'componentDidMount',
+	        value: function componentDidMount() {
+	            this.props.handleShifts();
+	        }
+	    }, {
 	        key: 'handleDelete',
 	        value: function handleDelete() {
 	            this.props.onShiftDelete(this.props.shift);
@@ -945,6 +1005,16 @@
 	                    'td',
 	                    null,
 	                    this.props.shift.name
+	                ),
+	                React.createElement(
+	                    'td',
+	                    null,
+	                    this.props.shift.date
+	                ),
+	                React.createElement(
+	                    'td',
+	                    null,
+	                    this.props.shift.time
 	                ),
 	                React.createElement(
 	                    'td',
@@ -26143,6 +26213,8 @@
 /* 200 */
 /***/ function(module, exports, __webpack_require__) {
 
+	// This file was based on the linked tutorial under to Creative Commons Licence
+	// https://spring.io/guides/tutorials/react-and-spring-data-rest/
 	'use strict';
 	
 	var rest = __webpack_require__(201);
@@ -28614,9 +28686,8 @@
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;'use strict';
 	
-	/**
-	 * Created by Kyle Tuckey on 15/03/2017.
-	 */
+	// This file was based on the linked tutorial under to Creative Commons Licence
+	// https://spring.io/guides/tutorials/react-and-spring-data-rest/
 	
 	!(__WEBPACK_AMD_DEFINE_RESULT__ = function (require) {
 	    'use strict';
@@ -28695,9 +28766,9 @@
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;'use strict';
 	
-	/**
-	 * Created by Kyle Tuckey on 15/03/2017.
-	 */
+	// This file was based on the linked tutorial under to Creative Commons Licence
+	// https://spring.io/guides/tutorials/react-and-spring-data-rest/
+	
 	!(__WEBPACK_AMD_DEFINE_RESULT__ = function () {
 	    'use strict';
 	
@@ -28726,6 +28797,9 @@
 /***/ function(module, exports) {
 
 	'use strict';
+	
+	// This file was based on the linked tutorial under to Creative Commons Licence
+	// https://spring.io/guides/tutorials/react-and-spring-data-rest/
 	
 	module.exports = function follow(api, rootPath, token, relArray) {
 	    var root = api({

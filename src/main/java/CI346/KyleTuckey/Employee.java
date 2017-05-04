@@ -24,6 +24,14 @@ public class Employee {
 
     private Employee(){}
 
+    public Long getId(){
+        return this.id;
+    }
+
+    public String getDescription(){
+        return this.description;
+    }
+
     public Employee(String name, String description) {
         this.name = name;
         this.description = description;

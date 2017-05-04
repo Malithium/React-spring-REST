@@ -14,5 +14,7 @@ CREATE TABLE `shift`(
   `shift_id` BIGINT PRIMARY KEY AUTO_INCREMENT,
   `employee_id` BIGINT REFERENCES employee(employee_id),
   `name` varchar(255)  DEFAULT NULL,
+  `date` DATE DEFAULT NULL,
+  `time` VARCHAR(10) DEFAULT NULL,
   `version` int(11) unsigned DEFAULT 0
 ) ENGINE = InnoDB DEFAULT CHARSET=utf8;

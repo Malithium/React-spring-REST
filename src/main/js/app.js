@@ -1,4 +1,4 @@
-// This file was based on the linked tutorial under to Creative Commons Licence
+// This file was based on the linked tutorial under the Creative Commons Licence
 // https://spring.io/guides/tutorials/react-and-spring-data-rest/
 
 'use strict';
@@ -300,20 +300,35 @@ class CreateShiftDialog extends React.Component {
             newShift[attribute] = ReactDOM.findDOMNode(this.refs[attribute]).value.trim();
         });
         this.props.onCreateShift(newShift, this.props.shifts);
+        this.props.handleShifts();
     }
 
     render() {
         var inputs = [];
         for(var attr in this.props.attributes)
         {
-            if(this.props.attributes[attr] != 'employee') {
+            if(this.props.attributes[attr] == 'name') {
                 inputs.push(<p key={this.props.attributes[attr]}>
                     <input type="text" placeholder={this.props.attributes[attr]} ref={this.props.attributes[attr]} className="field" />
                 </p>)
             }
-            else {
+            if(this.props.attributes[attr] == 'employee')  {
                 inputs.push(<p key={this.props.attributes[attr]}>
                     <input type="text" disabled="true" value={this.props.selfEmployee.href} ref={this.props.attributes[attr]} className="field" />
+                </p>)
+            }
+            if(this.props.attributes[attr] == 'date') {
+                inputs.push(<p key={this.props.attributes[attr]}>
+                    <input type="date" placeholder={this.props.attributes[attr]} ref={this.props.attributes[attr]} className="field" />
+                </p>)
+            }
+            if(this.props.attributes[attr] == 'time') {
+                inputs.push(<p key={this.props.attributes[attr]}>
+                    <select name={this.props.attributes[attr]} ref={this.props.attributes[attr]} className="field">
+                        <option value="Morning">Morning</option>
+                        <option value="Afternoon">Afternoon</option>
+                        <option value="Evening">Evening</option>
+                    </select>
                 </p>)
             }
 
@@ -387,7 +402,6 @@ class ShiftDialog extends React.Component {
         super(props);
         this.handleShifts = this.handleShifts.bind(this);
         this.state = {getShifts: []};
-        this.handleShifts();
     }
 
     handleShifts(){
@@ -398,47 +412,57 @@ class ShiftDialog extends React.Component {
         }).then(shiftsCollection => {
             return shiftsCollection.entity._embedded.shifts;
         }).done(shifts =>{
+            console.log(shifts);
             this.setState({
                 getShifts: shifts
             });
         });
-
+        console.log(this.state.getShifts);
+        window.location.href = "#" + "showShift-" + this.props.selfEmployee.href;
     }
 
     render() {
-        var shifts = this.state.getShifts.map(shift =>
-            <Shift key={shift._links.self.href}
-                      shift={shift}
-                      attributes={this.props.attributes}
-                      onShiftDelete={this.props.onShiftDelete}
-                      handleShifts={this.handleShifts}/>
-        );
-        return (
-            <div>
-                <a href="#viewShifts">Shifts</a>
-                <div id="viewShifts" className="modalDialog">
-                    <div>
-                        <a href="#" title="Close" className="close">X</a>
+        var shifts = [];
+        if(this.state.getShifts.length > 0) {
+            shifts = this.state.getShifts.map(shift =>
+                <Shift key={shift._links.self.href}
+                       shift={shift}
+                       attributes={this.props.attributes}
+                       onShiftDelete={this.props.onShiftDelete}
+                       handleShifts={this.handleShifts}/>
+            );
+        }
 
-                        <h2>Employee Shifts</h2>
-                        <CreateShiftDialog shifts={this.props.shifts}
-                                           attributes={this.props.attributes}
-                                           onCreateShift={this.props.onCreateShift}
-                                           selfEmployee={this.props.selfEmployee}
-                                           handleShifts={this.handleShifts()}/>
-                        <h2>View Employee Shifts</h2>
-                        <table>
-                            <tbody>
-                            <tr>
-                                <th>Name</th>
-                                <th></th>
-                            </tr>
-                            {shifts}
-                            </tbody>
-                        </table>
-                    </div>
+        var dialogId = "ShowShift-" + this.props.selfEmployee.href;
+
+        return (
+        <div key={this.props.selfEmployee.href}>
+            <a onClick={this.handleShifts} href={"#" + dialogId}>ShowShifts</a>
+            <div id={dialogId} className="modalDialog">
+                <div>
+                    <a href="#" title="Close" className="close">X</a>
+
+                    <h2>Employee Shifts</h2>
+                    <CreateShiftDialog shifts={this.props.shifts}
+                                       attributes={this.props.attributes}
+                                       onCreateShift={this.props.onCreateShift}
+                                       selfEmployee={this.props.selfEmployee}
+                                       handleShifts={this.handleShifts}/>
+                    <h2>View Employee Shifts</h2>
+                    <table>
+                        <tbody>
+                        <tr>
+                            <th>Name</th>
+                            <th>Date</th>
+                            <th>Time</th>
+                            <th></th>
+                        </tr>
+                        {shifts}
+                        </tbody>
+                    </table>
                 </div>
             </div>
+        </div>
         )
     }
 };
@@ -582,6 +606,10 @@ class Shift extends React.Component {
         this.handleDelete = this.handleDelete.bind(this);
     }
 
+    componentDidMount(){
+        this.props.handleShifts();
+    }
+
     handleDelete() {
         this.props.onShiftDelete(this.props.shift);
         this.props.handleShifts();
@@ -591,6 +619,8 @@ class Shift extends React.Component {
         return (
             <tr>
                 <td>{this.props.shift.name}</td>
+                <td>{this.props.shift.date}</td>
+                <td>{this.props.shift.time}</td>
                 <td>
                     <button onClick={this.handleDelete}>Delete</button>
                 </td>

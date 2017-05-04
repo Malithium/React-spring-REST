@@ -1,7 +1,7 @@
 {
-  "realm": "",
-  "auth-server-url": "",
-  "ssl-required": "",
-  "resource": "",
-  "public-client": 
+  "realm": "demo",
+  "auth-server-url": "http://localhost:8080/auth",
+  "ssl-required": "external",
+  "resource": "tut-frontend",
+  "public-client": true
 }

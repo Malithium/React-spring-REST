@@ -7,6 +7,8 @@ import lombok.Data;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import java.util.Date;
+
 /**
  * Created by Kyle Tuckey on 15/03/2017.
  */
@@ -17,7 +19,8 @@ public class Shift {
     @Column(name = "shift_id")
     private @Id @GeneratedValue Long id;
     private String name;
-
+    private Date date;
+    private String time;
 
     @ManyToOne
     @JsonBackReference
@@ -28,7 +31,15 @@ public class Shift {
 
     private Shift(){}
 
-    public Shift(String name){
+    public Long getId()
+    {
+        return this.id;
+    }
+
+    public Shift(String name, Date date, String time)
+    {
         this.name = name;
+        this.date = date;
+        this.time = time;
     }
 }
