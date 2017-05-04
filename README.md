@@ -42,3 +42,7 @@ configure the application properties:
  - keycloak.securityConstraints[0].securityCollections[0].patterns[0] = 
 
 in order for it to work
+
+# Known Bugs and issues
+ - There is a delay when creating a shift for an employee, the display for this feature closes itself, and takes some time to reopen when clicked
+ - there is no way to update shifts, this functionality was not implemented
