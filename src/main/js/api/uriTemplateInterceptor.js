@@ -1,6 +1,5 @@
-/**
- * Created by Kyle Tuckey on 15/03/2017.
- */
+// This file was based on the linked tutorial under to Creative Commons Licence
+// https://spring.io/guides/tutorials/react-and-spring-data-rest/
 
 define(function(require) {
     'use strict';

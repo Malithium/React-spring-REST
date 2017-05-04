@@ -1,3 +1,6 @@
+// This file was based on the linked tutorial under to Creative Commons Licence
+// https://spring.io/guides/tutorials/react-and-spring-data-rest/
+
 module.exports = function follow(api, rootPath, token,relArray) {
     var root = api({
         method: 'GET',
