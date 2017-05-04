@@ -3,7 +3,7 @@ This repository is my submission for assignment 2 of the CI346 module, the imple
 tutorial: https://spring.io/guides/tutorials/react-and-spring-data-rest/ which is under the Creative Commons Licence.
 
 # Database setup
-There is an included db.sql that should build the database required to run this application, you will also need to configure the application
+There is an included db.sql in the static resources folder that should build the database required to run this application, you will also need to configure the application
 properties, more specifically the:
 
  - spring.datasource.url=
